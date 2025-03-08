@@ -3,12 +3,30 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import argparse
 
-def solve_heat_equation(t : np.ndarray) -> np.ndarray:
-    for k in range(0, max_iter_time-1):
+
+def solve_heat_equation(t : np.ndarray) -> (np.ndarray, np.array):
+    """
+    Solves the 2D heat equation over a given time period.
+
+    Parameters:
+    t (np.ndarray): A 3D numpy array representing the temperature grid at each time step.
+                    The shape of the array is (max_iter_time, domain, domain).
+
+    Returns:
+    np.ndarray: The updated temperature grid after solving the heat equation.
+    np.array: An array containing the error values at each time step.
+
+    The function iterates over the time steps and updates the temperature grid based on the
+    finite difference method. It also calculates the error between the solutions at consecutive
+    time steps and stores these error values in an array.
+    """
+    errors = np.zeros(max_iter_time)
+    for k in range(max_iter_time):
         for i in range(1, domain-1):
             for j in range(1, domain-1):
                 t[k + 1, i, j] = gamma * (t[k, i + 1, j] + t[k, i - 1, j] + t[k, i, j + 1] + t[k, i, j - 1]) + (1 - 4 * gamma) * t[k, i, j]
-    return t
+        errors[k] = np.sqrt(np.sum(delta_t * (t[k + 1, 1:domain-1, 1:domain-1] - t[k, 1:domain-1, 1:domain-1]) ** 2))
+    return t, errors
 
 def plot_heat_map(t_k : float, k : int) -> plt:
     plt.clf()
@@ -56,7 +74,13 @@ def get_initial_condition() -> (float, float, float, float, float):
 
     return T_initial, T_top, T_left, T_right, T_bottom
 
-
+def plot_errors(errors_array : np.ndarray) -> plt:
+    plt.clf()
+    plt.plot(np.arange(max_iter_time)*delta_t, errors_array)
+    plt.title("Error over time")
+    plt.xlabel("Time")
+    plt.ylabel("Error")
+    return plt
 
 
 if __name__ == "__main__":
@@ -107,10 +131,13 @@ if __name__ == "__main__":
     T[:, :1, :] = T_bottom
 
     print("Solving heat equation...")
-    T = solve_heat_equation(T)
+    T, errors = solve_heat_equation(T)
 
     anim = FuncAnimation(plt.figure(), animate, interval=1, frames=max_iter_time, repeat=False)
     anim.save("output_animation/heat_equation.gif")
+
+    error_plot = plot_errors(errors)
+    error_plot.savefig("output_error/error_plot.png")
 
     print("Done")
 

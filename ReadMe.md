@@ -11,3 +11,7 @@ python main.py
 ```
 
 ![Example_output](output_animation/Example.gif)
+
+## Acknowledgements
+
+- [ESILV, Paris](https://www.esilv.fr/en/)
