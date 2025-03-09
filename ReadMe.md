@@ -4,6 +4,22 @@ This is a simple Python program that solves partial differential equations using
 
 This project is part of the couse "Equation dérivées partielles" at ESILV, Paris.
 
+## Installation
+
+Use pip :
+
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+Use the following command to see usage :
+
+```bash
+python main.py --help
+```
+
 ## Example output
 
 ```bash

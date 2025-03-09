@@ -21,7 +21,9 @@ def solve_heat_equation(t : np.ndarray) -> (np.ndarray, np.array):
     time steps and stores these error values in an array.
     """
     errors = np.zeros(max_iter_time)
-    for k in range(max_iter_time):
+    tol = 1e-7
+    k = 0
+    while k<max_iter_time-1 and errors[k]>tol:
         for i in range(1, domain-1):
             for j in range(1, domain-1):
                 t[k + 1, i, j] = gamma * (t[k, i + 1, j] + t[k, i - 1, j] + t[k, i, j + 1] + t[k, i, j - 1]) + (1 - 4 * gamma) * t[k, i, j]
