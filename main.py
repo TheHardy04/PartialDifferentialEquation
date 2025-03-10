@@ -22,12 +22,18 @@ def solve_heat_equation(t : np.ndarray) -> (np.ndarray, np.array):
     """
     errors = np.zeros(max_iter_time)
     tol = 1e-7
+    errors[0] = tol
     k = 0
-    while k<max_iter_time-1 and errors[k]>tol:
+    while k<max_iter_time-1 and errors[k]>=tol:
+
         for i in range(1, domain-1):
             for j in range(1, domain-1):
                 t[k + 1, i, j] = gamma * (t[k, i + 1, j] + t[k, i - 1, j] + t[k, i, j + 1] + t[k, i, j - 1]) + (1 - 4 * gamma) * t[k, i, j]
-        errors[k] = np.sqrt(np.sum(delta_t * (t[k + 1, 1:domain-1, 1:domain-1] - t[k, 1:domain-1, 1:domain-1]) ** 2))
+        errors[k+1] = np.sqrt(np.sum(delta_t * (t[k + 1, 1:domain-1, 1:domain-1] - t[k, 1:domain-1, 1:domain-1]) ** 2))
+        k += 1
+    print("number of iterations: ", k+1)
+    print("final time t: ", k*delta_t)
+    print("final error: ", errors[k])
     return t, errors
 
 def plot_heat_map(t_k : float, k : int) -> plt:
@@ -37,7 +43,7 @@ def plot_heat_map(t_k : float, k : int) -> plt:
     plt.xlabel("x")
     plt.ylabel("y")
 
-    plt.pcolormesh(t_k, cmap=plt.cm.jet, vmin=0, vmax=100)
+    plt.pcolormesh(t_k, cmap=plt.cm.jet, vmin=T_min, vmax=T_max)
     plt.colorbar()
 
     return plt
@@ -74,7 +80,7 @@ def get_initial_condition() -> (float, float, float, float, float):
     print("Enter bottom temperature: ")
     t_bottom = get_float()
 
-    return T_initial, T_top, T_left, T_right, T_bottom
+    return t_initial, t_top, t_left, t_right, t_bottom
 
 def plot_errors(errors_array : np.ndarray) -> plt:
     plt.clf()
@@ -116,14 +122,18 @@ if __name__ == "__main__":
     # set initial condition
     T_initial = 0
 
-    T_top = 0
+    T_top = 100
     T_left = 0
     T_right = 0
-    T_bottom = 100
+    T_bottom = 0
 
     if y_n_question("Do you want to set initial condition? (y/n)"):
         T_initial, T_top, T_left, T_right, T_bottom = get_initial_condition()
 
+    T_min = min(T_top, T_left, T_right, T_bottom, T_initial)
+    T_max = max(T_top, T_left, T_right, T_bottom, T_initial)
+
+    print(T_initial, T_top, T_left, T_right, T_bottom, T_min)
     # set boundary conditions
     T.fill(T_initial)
 
@@ -142,4 +152,3 @@ if __name__ == "__main__":
     error_plot.savefig("output_error/error_plot.png")
 
     print("Done")
-
