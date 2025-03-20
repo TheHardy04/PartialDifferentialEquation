@@ -28,9 +28,12 @@ def solve_heat_equation(t : np.ndarray) -> (np.ndarray, np.array):
 
         for i in range(1, domain-1):
             for j in range(1, domain-1):
-                t[k + 1, i, j] = gamma * (t[k, i + 1, j] + t[k, i - 1, j] + t[k, i, j + 1] + t[k, i, j - 1]) + (1 - 4 * gamma) * t[k, i, j]
+                # t[k + 1, i, j] = gamma * (t[k, i + 1, j] + t[k, i - 1, j] + t[k, i, j + 1] + t[k, i, j - 1]) + (1 - 4 * gamma) * t[k, i, j]
+                t[k + 1, i, j] = (4 * t[k, i, j] - t[k - 1, i, j] + 2 * gamma * (t[k, i + 1, j] + t[k, i, j+1] - 4 * t[k, i, j] + t[k, i - 1, j]+ t[k, i, j-1])) *(1/3)
         errors[k+1] = np.sqrt(np.sum(delta_t * (t[k + 1, 1:domain-1, 1:domain-1] - t[k, 1:domain-1, 1:domain-1]) ** 2))
+
         k += 1
+
     print("number of iterations: ", k+1)
     print("final time t: ", k*delta_t)
     print("final error: ", errors[k])
